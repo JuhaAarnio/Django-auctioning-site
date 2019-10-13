@@ -2,9 +2,13 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>$Title$</title>
+    <title>Title</title>
 </head>
 <body>
-$END$
+<form action={% url "auction:create" %} method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" value="Create auction" onclick="return confirm('Confirm posting your auction')">
+</form>>
 </body>
 </html>

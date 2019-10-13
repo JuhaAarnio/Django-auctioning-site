@@ -2,9 +2,14 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>YAAS Login</title>
 </head>
 <body>
+<form action={% url "signin" %} method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" value="Log in">
+</form>
 
 </body>
 </html>
