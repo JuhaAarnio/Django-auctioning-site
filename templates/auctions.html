@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+{% for auction in auctions %}
+    <h2>{{auction.item }}</h2>
+    <p>{{auction.description}}</p>
+    <p>{{auction.minimum_price}}</p>
+    <p>{{auction.deadline_date}}</p>
+{% endfor %}
+</body>
+</html>

@@ -6,4 +6,5 @@ class Auction(models.Model):
     description = models.TextField()
     minimum_price = models.FloatField()
     deadline_date = models.DateTimeField()
+    status = models.CharField(max_length=60)
     creator_id = models.IntegerField()

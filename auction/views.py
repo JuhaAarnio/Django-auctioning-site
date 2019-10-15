@@ -2,7 +2,7 @@ from django.views import View
 from django.http import HttpResponse, HttpResponseRedirect
 from .forms import AuctionForm
 from .models import Auction
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.contrib import messages
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
@@ -38,15 +38,14 @@ class CreateAuction(View):
             a_minimum_price = form_data["minimum_price"]
             a_deadline_date = form_data["deadline_date"]
             current_date = datetime.now(timezone.utc)
-            auction_date = a_deadline_date
+            auction_date = datetime.strptime(a_deadline_date, "%d-%m-%Y %H:%M:%S").astimezone(timezone.utc)
             difference = auction_date - current_date
             if difference < timedelta(hours=72):
                 messages.add_message(request, messages.INFO, "Invalid deadline")
                 return HttpResponseRedirect("createauction.html",status=400)
             else:
-                formatted_deadline = datetime.strptime("%d-%m-%Y %H-%M-%S", a_deadline_date)
-                auction = Auction(item=a_item, description=a_description,
-                                  minimum_price=a_minimum_price, deadline_date=formatted_deadline, creator_id=user_id)
+                auction = Auction(item=a_item, description=a_description, status="Active",
+                                  minimum_price=a_minimum_price, deadline_date=auction_date, creator_id=user_id )
                 auction.save()
                 return render(request, "home.html")
 
@@ -56,9 +55,15 @@ class CreateAuction(View):
 
 
 
-
+@method_decorator(login_required, name="dispatch")
 class EditAuction(View):
-    pass
+    def get(self, request, id):
+        auction = get_object_or_404(Auction, id=id)
+        if auction.status == "Active" and auction.creator_id == request.user.id:
+            return render(request, "editauction.html", {"description": auction.description})
+        else:
+            messages.add_message(request, messages.INFO,
+                                 "You are not authorized to edit this auction or the auction has already expired")
 
 
 def bid(request, item_id):
@@ -80,4 +85,8 @@ def changeLanguage(request, lang_code):
 def changeCurrency(request, currency_code):
     pass
 
+
+def browseAuctions(request):
+    auctions = Auction.objects.order_by('item')
+    return render(request, "auctions.html",{"auctions": auctions})
 
