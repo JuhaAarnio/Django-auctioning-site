@@ -8,3 +8,8 @@ class Auction(models.Model):
     deadline_date = models.DateTimeField()
     status = models.CharField(max_length=60)
     creator_id = models.IntegerField()
+
+
+class Bidder(models.Model):
+    auction_id = models.IntegerField()
+    bidder_id = models.IntegerField()

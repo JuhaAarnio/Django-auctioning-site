@@ -11,3 +11,6 @@ class AuctionForm(forms.Form):
 
 class EditAuctionForm(forms.Form):
     new_description = forms.CharField(label="New Description", max_length=256)
+
+class BiddingForm(forms.Form):
+    bid = forms.FloatField(label="Your bid")

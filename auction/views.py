@@ -1,6 +1,6 @@
 from django.views import View
 from django.http import HttpResponse, HttpResponseRedirect
-from .forms import AuctionForm
+from .forms import AuctionForm, EditAuctionForm
 from .models import Auction
 from django.shortcuts import render, get_object_or_404
 from django.contrib import messages
@@ -60,14 +60,26 @@ class EditAuction(View):
     def get(self, request, id):
         auction = get_object_or_404(Auction, id=id)
         if auction.status == "Active" and auction.creator_id == request.user.id:
-            return render(request, "editauction.html", {"description": auction.description})
+            return render(request, "editauction.html", {"description": auction.description}, auction)
         else:
             messages.add_message(request, messages.INFO,
                                  "You are not authorized to edit this auction or the auction has already expired")
 
+    def post(self, request, auction):
+        form = EditAuctionForm(request.POST)
+        if form.is_valid():
+            cd = form.cleaned_data
+            a_newdesc = cd["new_description"]
+            auction.description = a_newdesc
+            return render(request, "home.html")
+
 
 def bid(request, item_id):
-    pass
+    auction = get_object_or_404(Auction, id=item_id)
+    if auction.status is not "Active":
+        messages.add_message(request, messages.INFO, "You can only bid on active auctions")
+        return render(request, "bidding.html")
+
 
 
 def ban(request, item_id):
