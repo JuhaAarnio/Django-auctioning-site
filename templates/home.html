@@ -5,6 +5,14 @@
     <title>YASS Homepage</title>
 </head>
 <body>
-
+<h1>{"Yaas Homepage"</h1>
+    {% if user.is_authenticated%}
+        <p>Logged in as: {{ user.username }}
+        <a href="{% url 'create' %}">Create auction</a>
+        <a href="{% url 'signout' %}">Sing out</a>
+    {% else %}
+        <a href="{% url 'signup' %}">Sign Up</a>
+        <a href="{% url 'signin' %}">Sign In</a>
+    {% endif %}
 </body>
 </html>

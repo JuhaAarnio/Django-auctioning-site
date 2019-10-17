@@ -6,10 +6,17 @@
 </head>
 <body>
 {% for auction in auctions %}
-    <h2>{{auction.item }}</h2>
+    <h2>{{auction.item }}</h2> <a href="{% url 'auction:edit' auction.id %}">Edit Auction</a> <a href="{% url 'auction:bid' auction.id %}">Bid</a>
     <p>{{auction.description}}</p>
     <p>{{auction.minimum_price}}</p>
     <p>{{auction.deadline_date}}</p>
 {% endfor %}
+    {% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+            <li{% if message.tags %} class="{{message.tag}}"{% endif %}>{{message}}</li>
+    {% endfor %}
+    </ul>
+    {% endif %}
 </body>
 </html>

@@ -10,5 +10,12 @@
     {{ form.as_p }}
     <input type="submit" value="Create auction" onclick="return confirm('Confirm posting your auction')">
 </form>>
+    {% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+            <li{% if message.tags %} class="{{message.tag}}"{% endif %}>{{message}}</li>
+    {% endfor %}
+    </ul>
+    {% endif %}
 </body>
 </html>-

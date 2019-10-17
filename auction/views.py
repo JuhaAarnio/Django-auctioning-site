@@ -1,7 +1,7 @@
 from django.views import View
 from django.http import HttpResponse, HttpResponseRedirect
-from .forms import AuctionForm, EditAuctionForm
-from .models import Auction
+from .forms import AuctionForm, EditAuctionForm, BiddingForm
+from .models import Auction, Bidder
 from django.shortcuts import render, get_object_or_404
 from django.contrib import messages
 from django.utils.decorators import method_decorator
@@ -57,16 +57,17 @@ class CreateAuction(View):
 
 @method_decorator(login_required, name="dispatch")
 class EditAuction(View):
-    def get(self, request, id):
-        auction = get_object_or_404(Auction, id=id)
+    def get(self, request, item_id):
+        auction = get_object_or_404(Auction, id=item_id)
         if auction.status == "Active" and auction.creator_id == request.user.id:
             return render(request, "editauction.html", {"description": auction.description}, auction)
         else:
             messages.add_message(request, messages.INFO,
                                  "You are not authorized to edit this auction or the auction has already expired")
 
-    def post(self, request, auction):
+    def post(self, request, item_id):
         form = EditAuctionForm(request.POST)
+        auction = get_object_or_404(Auction, id=item_id)
         if form.is_valid():
             cd = form.cleaned_data
             a_newdesc = cd["new_description"]
@@ -75,10 +76,18 @@ class EditAuction(View):
 
 
 def bid(request, item_id):
+    user_id = request.user.id
     auction = get_object_or_404(Auction, id=item_id)
     if auction.status is not "Active":
         messages.add_message(request, messages.INFO, "You can only bid on active auctions")
-        return render(request, "bidding.html")
+        return render(request, "bidding.html", {"form": BiddingForm})
+    if auction.creator_id == user_id:
+        messages.add_message(request, messages.INFO, "You cannot bid on your own auction")
+        return render(request, "bidding.html", {"form": BiddingForm})
+    else:
+        bidder = Bidder(auction_id=item_id, bidder_id=user_id)
+        bidder.save()
+        messages.add_message(request, messages.INFO, "Succesfully bidded on auction")
 
 
 
