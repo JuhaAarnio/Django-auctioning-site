@@ -8,12 +8,12 @@ from auction.models import Auction
 from auction.serializers import SerializeAuctions
 
 
-@api_view(['GET'])
 @authentication_classes([BasicAuthentication])
 @permission_classes([IsAuthenticated])
 @renderer_classes([JSONRenderer])
 class BrowseAuctionApi(APIView):
-    def post(self, request):
+    @api_view(['GET'])
+    def get(self, request):
         auctions = Auction.objects.all()
         serializer = SerializeAuctions(auctions, many=True)
         return Response(serializer.data)
@@ -28,7 +28,13 @@ class SearchAuctionWithTermApi(APIView):
 
 
 class SearchAuctionApiById(APIView):
-    pass
+    def get(self, request, item_id):
+        auction = Auction.objects.filter(id=item_id)
+        if auction.DoesNotExist:
+            pass
+        else:
+            serializer = SerializeAuctions(auction, many=False)
+            return Response(serializer.data)
 
 
 class BidAuctionApi(APIView):

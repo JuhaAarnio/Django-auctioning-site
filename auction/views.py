@@ -53,8 +53,6 @@ class CreateAuction(View):
             return render(request, "trololoo.html")
 
 
-
-
 @method_decorator(login_required, name="dispatch")
 class EditAuction(View):
     def get(self, request, item_id):
