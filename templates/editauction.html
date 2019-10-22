@@ -15,7 +15,7 @@
     <form action={% url 'auction:bid' %} method="post">
         {% csrf_token %}
         {{ form.as_p }}
-        <input type="submit" value="Bid">
+        <input type="submit" value="Save">
     </form>>
 </body>
 </html>

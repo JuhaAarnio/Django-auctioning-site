@@ -24,7 +24,10 @@ class SearchAuctionApi(APIView):
 
 
 class SearchAuctionWithTermApi(APIView):
-    pass
+    def get(self, request, term):
+        auctions = Auction.objects.filter(term)
+        serializer = SerializeAuctions(auctions, many=True)
+        return Response(serializer.data)
 
 
 class SearchAuctionApiById(APIView):

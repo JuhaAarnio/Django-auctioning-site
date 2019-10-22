@@ -7,6 +7,7 @@ from django.contrib import messages
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from datetime import datetime, timedelta, timezone
+from django.core import mail
 
 
 
@@ -30,7 +31,7 @@ class CreateAuction(View):
 
     def post(self, request):
         form = AuctionForm(request.POST)
-        user_id = request.user.id
+        user = request.user
         if form.is_valid():
             form_data = form.cleaned_data
             a_item = form_data["item"]
@@ -44,8 +45,16 @@ class CreateAuction(View):
                 messages.add_message(request, messages.INFO, "Invalid deadline")
                 return HttpResponseRedirect("createauction.html",status=400)
             else:
+                connection = mail.get_connection()
+                message = mail.EmailMessage(
+                    'Auction created',
+                    'Your auction has been successfully created, use this link to edit',
+                    'yaas@dontreply.com',
+                    [user.email]
+                )
+                connection.send_messages(message)
                 auction = Auction(item=a_item, description=a_description, status="Active",
-                                  minimum_price=a_minimum_price, deadline_date=auction_date, creator_id=user_id )
+                                  minimum_price=a_minimum_price, deadline_date=auction_date, creator_id=user)
                 auction.save()
                 return render(request, "home.html")
 
@@ -85,12 +94,13 @@ def bid(request, item_id):
     else:
         bidder = Bidder(auction_id=item_id, bidder_id=user_id)
         bidder.save()
-        messages.add_message(request, messages.INFO, "Succesfully bidded on auction")
-
+        messages.add_message(request, messages.INFO, "Successfully bidded on auction")
 
 
 def ban(request, item_id):
-    pass
+    auction = Auction.objects.filter(id=item_id)
+    auction.status = "Banned"
+    auction.save()
 
 
 def resolve(request):
@@ -107,5 +117,5 @@ def changeCurrency(request, currency_code):
 
 def browseAuctions(request):
     auctions = Auction.objects.order_by('item')
-    return render(request, "auctions.html",{"auctions": auctions})
+    return render(request, "auctions.html", {"auctions": auctions})
 
