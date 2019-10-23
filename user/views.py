@@ -4,12 +4,9 @@ from django.contrib.auth.models import User
 from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from .forms import SignUpForm, SignInForm, EditUserForm
-#from .models import User
 from django.contrib import auth, messages
 from django.urls import reverse
 from django.http import HttpResponseRedirect, HttpResponse
-from rest_framework import status
-from rest_framework.response import Response
 
 
 class SignUp(View):

@@ -8,6 +8,10 @@ from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from datetime import datetime, timedelta, timezone
 from django.core import mail
+from django.http import HttpResponseRedirect
+from django.urls import reverse
+from django.utils import translation
+from django.utils.translation import gettext as _
 
 
 
@@ -108,7 +112,11 @@ def resolve(request):
 
 
 def changeLanguage(request, lang_code):
-    pass
+    translation.activate(lang_code)
+    request.session[translation.LANGUAGE_SESSION_KEY] = lang_code
+    messages.add_message(request, messages.INFO, "Language changed successfully")
+    return HttpResponseRedirect(reverse("home"))
+
 
 
 def changeCurrency(request, currency_code):
