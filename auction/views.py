@@ -46,8 +46,8 @@ class CreateAuction(View):
             auction_date = datetime.strptime(a_deadline_date, "%d-%m-%Y %H:%M:%S").astimezone(timezone.utc)
             difference = auction_date - current_date
             if difference < timedelta(hours=72):
-                messages.add_message(request, messages.INFO, "Invalid deadline")
-                return HttpResponseRedirect("createauction.html",status=400)
+                messages.add_message(request, messages.INFO, _("Invalid deadline"))
+                return HttpResponseRedirect("createauction.html", status=400)
             else:
                 connection = mail.get_connection()
                 message = mail.EmailMessage(
@@ -74,7 +74,7 @@ class EditAuction(View):
             return render(request, "editauction.html", {"description": auction.description}, auction)
         else:
             messages.add_message(request, messages.INFO,
-                                 "You are not authorized to edit this auction or the auction has already expired")
+                                 _("You are not authorized to edit this auction or the auction has already expired"))
 
     def post(self, request, item_id):
         form = EditAuctionForm(request.POST)
@@ -90,15 +90,15 @@ def bid(request, item_id):
     user_id = request.user.id
     auction = get_object_or_404(Auction, id=item_id)
     if auction.status is not "Active":
-        messages.add_message(request, messages.INFO, "You can only bid on active auctions")
+        messages.add_message(request, messages.INFO, _("You can only bid on active auctions"))
         return render(request, "bidding.html", {"form": BiddingForm})
     if auction.creator_id == user_id:
-        messages.add_message(request, messages.INFO, "You cannot bid on your own auction")
+        messages.add_message(request, messages.INFO, _("You cannot bid on your own auction"))
         return render(request, "bidding.html", {"form": BiddingForm})
     else:
         bidder = Bidder(auction_id=item_id, bidder_id=user_id)
         bidder.save()
-        messages.add_message(request, messages.INFO, "Successfully bidded on auction")
+        messages.add_message(request, messages.INFO, _("Successfully bidded on auction"))
 
 
 def ban(request, item_id):
@@ -114,9 +114,8 @@ def resolve(request):
 def changeLanguage(request, lang_code):
     translation.activate(lang_code)
     request.session[translation.LANGUAGE_SESSION_KEY] = lang_code
-    messages.add_message(request, messages.INFO, "Language changed successfully")
+    messages.add_message(request, messages.INFO, _("Language changed successfully"))
     return HttpResponseRedirect(reverse("home"))
-
 
 
 def changeCurrency(request, currency_code):
