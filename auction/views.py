@@ -7,7 +7,7 @@ from django.contrib import messages
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from datetime import datetime, timedelta, timezone
-from django.core import mail
+from django.core.mail import send_mail
 
 
 
@@ -45,14 +45,8 @@ class CreateAuction(View):
                 messages.add_message(request, messages.INFO, "Invalid deadline")
                 return HttpResponseRedirect("createauction.html",status=400)
             else:
-                connection = mail.get_connection()
-                message = mail.EmailMessage(
-                    'Auction created',
-                    'Your auction has been successfully created, use this link to edit',
-                    'yaas@dontreply.com',
-                    [user.email]
-                )
-                connection.send_messages(message)
+                send_mail('Auction created', 'Your auction has been successfully created, use this link to edit',
+                                'yaas@dontreply.com', [user.email])
                 auction = Auction(item=a_item, description=a_description, status="Active",
                                   minimum_price=a_minimum_price, deadline_date=auction_date, creator_id=user)
                 auction.save()
@@ -71,6 +65,7 @@ class EditAuction(View):
         else:
             messages.add_message(request, messages.INFO,
                                  "You are not authorized to edit this auction or the auction has already expired")
+            return render(request, 'home.html')
 
     def post(self, request, item_id):
         form = EditAuctionForm(request.POST)
@@ -79,6 +74,7 @@ class EditAuction(View):
             cd = form.cleaned_data
             a_newdesc = cd["new_description"]
             auction.description = a_newdesc
+            auction.save()
             return render(request, "home.html")
 
 
