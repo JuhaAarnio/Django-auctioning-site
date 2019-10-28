@@ -14,7 +14,10 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.utils import translation
 from django.utils.translation import gettext as _
+<<<<<<< HEAD
 
+=======
+>>>>>>> b3753a73ee3ca14f6e48cea420298fe74ce99f97
 
 
 
@@ -72,8 +75,11 @@ class EditAuction(View):
         else:
             messages.add_message(request, messages.INFO,
                                  _("You are not authorized to edit this auction or the auction has already expired"))
+<<<<<<< HEAD
             return render(request, 'home.html')
 
+=======
+>>>>>>> b3753a73ee3ca14f6e48cea420298fe74ce99f97
 
     def post(self, request, item_id):
         form = EditAuctionForm(request.POST)
