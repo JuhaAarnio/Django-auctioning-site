@@ -7,7 +7,6 @@ from django.contrib import messages
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from datetime import datetime, timedelta, timezone
-
 from django.core.mail import send_mail
 from django.http import HttpResponseRedirect
 from django.urls import reverse
@@ -26,7 +25,16 @@ def index(request):
 
 
 def search(request):
-    pass
+    search_term = request.POST
+    matching_auctions = Auction.objects.all().filter(Auction.item.__contains__(search_term))
+    if len(matching_auctions) < 1 and search_term != ' ':
+        messages.add_message(request, messages.INFO, _("No auctions found"))
+        return render(request, 'auctions.html')
+    else:
+        return render(request, 'searchresults.html', {"matching_auctions": matching_auctions})
+
+
+
 
 
 @method_decorator(login_required, name="dispatch")
@@ -52,9 +60,9 @@ class CreateAuction(View):
                 return HttpResponseRedirect("createauction.html", status=400)
             else:
                 send_mail('Auction created', 'Your auction has been successfully created, use this link to edit',
-                                'yaas@dontreply.com', [user.email])
+                          'yaas@dontreply.com', [user.email])
                 auction = Auction(item=a_item, description=a_description, status="Active",
-                                  minimum_price=a_minimum_price, deadline_date=auction_date, creator_id=user)
+                                  minimum_price=a_minimum_price, deadline_date=auction_date, creator=user)
                 auction.save()
                 return render(request, "home.html")
 
@@ -66,14 +74,12 @@ class CreateAuction(View):
 class EditAuction(View):
     def get(self, request, item_id):
         auction = get_object_or_404(Auction, id=item_id)
-        if auction.status == "Active" and auction.creator_id == request.user.id:
+        if auction.status == "Active" and auction.creator == request.user:
             return render(request, "editauction.html", {"description": auction.description}, auction)
         else:
             messages.add_message(request, messages.INFO,
                                  _("You are not authorized to edit this auction or the auction has already expired"))
             return render(request, 'home.html')
-
-
 
     def post(self, request, item_id):
         form = EditAuctionForm(request.POST)
@@ -87,24 +93,39 @@ class EditAuction(View):
 
 
 def bid(request, item_id):
-    user_id = request.user.id
+    user = request.user
     auction = get_object_or_404(Auction, id=item_id)
+    bid_amount = request.POST
     if auction.status is not "Active":
         messages.add_message(request, messages.INFO, _("You can only bid on active auctions"))
-        return render(request, "bidding.html", {"form": BiddingForm})
-    if auction.creator_id == user_id:
+        return render(request, "home.html", {"form": BiddingForm})
+    if auction.creator == user:
         messages.add_message(request, messages.INFO, _("You cannot bid on your own auction"))
-        return render(request, "bidding.html", {"form": BiddingForm})
+        return render(request, "home.html", {"form": BiddingForm})
+    if auction.minimum_price >= bid_amount:
+        messages.add_message(request, messages.INFO, _("There already exists a higher bid"))
+        return render(request, "home.html")
+    if auction.highest_bidder_id == user.id:
+        messages.add_message(request, messages.INFO, _("You are already the highest bidder"))
+        return render(request, "home.html")
     else:
-        bidder = Bidder(auction_id=item_id, bidder_id=user_id)
+        bidder = Bidder(auction_id=item_id, bidder=user)
+        auction.minimum_price = bid_amount
+        auction.highest_bidder_id = user.id
         bidder.save()
+        auction.save()
         messages.add_message(request, messages.INFO, _("Successfully bidded on auction"))
+        return HttpResponseRedirect(reverse("home"))
 
 
 def ban(request, item_id):
-    auction = Auction.objects.filter(id=item_id)
-    auction.status = "Banned"
-    auction.save()
+    user = request.user
+    if user.is_superuser:
+        auction = Auction.objects.filter(id=item_id)
+        auction.status = "Banned"
+        auction.save()
+    else:
+        messages.add_message(request, messages.INFO, _("Only moderators can ban auctions"))
 
 
 def resolve(request):
@@ -119,7 +140,8 @@ def changeLanguage(request, lang_code):
 
 
 def changeCurrency(request, currency_code):
-    pass
+    currency = currency_code
+    currencies = {'EUR', 'USD'}
 
 
 def browseAuctions(request):

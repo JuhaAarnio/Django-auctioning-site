@@ -5,12 +5,7 @@
     <title>Title</title>
 </head>
 <body>
-<form action={% url "auction:search" %} method="post">
-    {% csrf_token %}
-    <input type="text", name="search_term">
-    <input type="submit", value="Search">
-</form>
-{% for auction in auctions %}
+{% for auction in matching_auctions %}
     {% if auction.status == "Active"%}
         {% if user.is_authenticated %}
             <h2>{{auction.item }}</h2> <a href="{% url 'auction:edit' auction.id %}">Edit Auction</a> <a href="{% url 'auction:bid' auction.id %}">Bid</a>
@@ -22,8 +17,8 @@
         <p>{{auction.creator_id}}</p>
         <form action={% url 'auction:bid' %} method="post">
             {% csrf_token %}
-            <input type="text", name="bid_amount">
-            <input type="submit", value="Bid">
+            {{ form.as_p }}
+            <input type="Submit", value="Bid">
         </form>
     {% endif %}
 {% endfor %}
