@@ -46,6 +46,7 @@ class CreateAuction(View):
     def post(self, request):
         form = AuctionForm(request.POST)
         user = request.user
+        username = request.user.username
         if form.is_valid():
             form_data = form.cleaned_data
             a_item = form_data["item"]
@@ -61,8 +62,8 @@ class CreateAuction(View):
             else:
                 send_mail('Auction created', 'Your auction has been successfully created, use this link to edit',
                           'yaas@dontreply.com', [user.email])
-                auction = Auction(item=a_item, description=a_description, status="Active",
-                                  minimum_price=a_minimum_price, deadline_date=auction_date, creator=user)
+                auction = Auction(item=a_item, description=a_description, status="Active", minimum_price=a_minimum_price,
+                                  deadline_date=auction_date, creator=username, highest_bidder_id=-1)
                 auction.save()
                 return render(request, "home.html")
 
@@ -74,8 +75,9 @@ class CreateAuction(View):
 class EditAuction(View):
     def get(self, request, item_id):
         auction = get_object_or_404(Auction, id=item_id)
-        if auction.status == "Active" and auction.creator == request.user:
-            return render(request, "editauction.html", {"description": auction.description}, auction)
+        if auction.status == "Active" and auction.creator == request.user.username:
+            return render(request, "editauction.html", {"description": auction.description, "form": EditAuctionForm},
+                          auction)
         else:
             messages.add_message(request, messages.INFO,
                                  _("You are not authorized to edit this auction or the auction has already expired"))
@@ -99,7 +101,7 @@ def bid(request, item_id):
     if auction.status is not "Active":
         messages.add_message(request, messages.INFO, _("You can only bid on active auctions"))
         return render(request, "home.html", {"form": BiddingForm})
-    if auction.creator == user:
+    if auction.creator == user.username:
         messages.add_message(request, messages.INFO, _("You cannot bid on your own auction"))
         return render(request, "home.html", {"form": BiddingForm})
     if auction.minimum_price >= bid_amount:
@@ -124,8 +126,10 @@ def ban(request, item_id):
         auction = Auction.objects.filter(id=item_id)
         auction.status = "Banned"
         auction.save()
+        return HttpResponseRedirect(reverse("home"))
     else:
         messages.add_message(request, messages.INFO, _("Only moderators can ban auctions"))
+        return HttpResponseRedirect("home")
 
 
 def resolve(request):

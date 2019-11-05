@@ -10,23 +10,28 @@
     <input type="text", name="search_term">
     <input type="submit", value="Search">
 </form>
-{% for auction in auctions %}
-    {% if auction.status == "Active"%}
-        {% if user.is_authenticated %}
-            <h2>{{auction.item }}</h2> <a href="{% url 'auction:edit' auction.id %}">Edit Auction</a> <a href="{% url 'auction:bid' auction.id %}">Bid</a>
-            <a> href?="{% url 'auction:ban' %}">Ban</a>
+{% if auctions.count > 0 %}
+    {% for auction in auctions %}
+        {% if auction.status == "Active"%}
+            {% if user.is_authenticated %}
+                <h2>{{auction.item }}</h2> <a href="{% url 'auction:edit' auction.id %}">Edit Auction</a>
+                <a href="{% url 'auction:ban' auction.id %}">Ban</a>
+            {% endif %}
+            <p>{{auction.description}}</p>
+            <p>{{auction.minimum_price}}</p>
+            <p>{{auction.deadline_date}}</p>
+            <p>{{auction.creator}}</p>
+            <p>{{auction.status}}</p>
+            <form action={% url 'auction:bid' auction.id %} method="post">
+                {% csrf_token %}
+                <input type="text", name="bid_amount">
+                <input type="submit", value="Bid">
+            </form>
         {% endif %}
-        <p>{{auction.description}}</p>
-        <p>{{auction.minimum_price}}</p>
-        <p>{{auction.deadline_date}}</p>
-        <p>{{auction.creator_id}}</p>
-        <form action={% url 'auction:bid' %} method="post">
-            {% csrf_token %}
-            <input type="text", name="bid_amount">
-            <input type="submit", value="Bid">
-        </form>
-    {% endif %}
-{% endfor %}
+    {% endfor %}
+{% else %}
+    <p>No active auctions found</p>
+{% endif %}
     {% if messages %}
     <ul class="messages">
         {% for message in messages %}
