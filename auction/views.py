@@ -83,7 +83,7 @@ class EditAuction(View):
                                  _("You are not authorized to edit this auction or the auction has already expired"))
             return render(request, 'home.html')
 
-    def post(self, request, item_id):
+    def post(self, request):
         form = EditAuctionForm(request.POST)
         auction = get_object_or_404(Auction, id=item_id)
         if form.is_valid():

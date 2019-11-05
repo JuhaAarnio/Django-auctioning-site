@@ -14,7 +14,7 @@
     {% for auction in auctions %}
         {% if auction.status == "Active"%}
             {% if user.is_authenticated %}
-                <h2>{{auction.item }}</h2> <a href="{% url 'auction:edit' auction.id %}">Edit Auction</a>
+                <h2>{{auction.item }}</h2> <a href="{% url 'auction:edit' auction.id%}">Edit Auction</a>
                 <a href="{% url 'auction:ban' auction.id %}">Ban</a>
             {% endif %}
             <p>{{auction.description}}</p>
