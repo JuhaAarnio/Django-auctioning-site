@@ -5,7 +5,8 @@
     <title>YASS Homepage</title>
 </head>
 <body>
-<h1>{"Yaas Homepage"</h1>
+{% load i18n %}
+<h1>{% trans "Yaas Homepage" %}</h1>
     {% if user.is_authenticated%}
         <p>Logged in as: {{ user.username }}
         <a href="{% url 'auction:create' %}">Create auction</a>

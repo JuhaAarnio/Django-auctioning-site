@@ -1,0 +1,84 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2019-11-05 21:29+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: views.py:31
+msgid "No auctions found"
+msgstr "Inga auktioner hittades"
+
+#: views.py:60
+msgid "Invalid deadline"
+msgstr "Ogiltig tidsfrist"
+
+#: views.py:83
+msgid ""
+"You are not authorized to edit this auction or the auction has already "
+"expired"
+msgstr "Du har inte behörighet att redigera denna auktion eller så har auktionen redan"
+
+#: views.py:102
+msgid "You can only bid on active auctions"
+msgstr "Du kan bara bjuda på aktiva auktioner"
+
+#: views.py:105
+msgid "You cannot bid on your own auction"
+msgstr "Du kan inte bjuda på din egen auktion"
+
+#: views.py:108
+msgid "There already exists a higher bid"
+msgstr "Det finns redan ett högre bud"
+
+#: views.py:111
+msgid "You are already the highest bidder"
+msgstr "Du är redan högstbjudande"
+
+#: views.py:119
+msgid "Successfully bidded on auction"
+msgstr "Framgångsrikt bud på auktion"
+
+#: views.py:131
+msgid "Only moderators can ban auctions"
+msgstr "Endast moderatorer kan förbjuda auktioner"
+
+#: views.py:142
+msgid "Language changed successfully"
+msgstr "Språk har ändrats framgångsrikt"
+
+#: views.py:26
+msgid "This username has been taken"
+msgstr "Detta användarnamn har tagits"
+
+#: views.py:29
+msgid "This email has been taken"
+msgstr "Det här e-postmeddelandet har tagits"
+
+#: views.py:53
+msgid "Logged in"
+msgstr "Loggad in"
+
+#: views.py:56
+msgid "Invalid username or password"
+msgstr ""
+
+#: views.py:66
+msgid "Logged out"
+msgstr "Ogiltigt användarnamn eller lösenord"
+
+#: views.py:86
+msgid "Email already taken"
+msgstr "E-post redan taget"

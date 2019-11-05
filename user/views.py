@@ -7,6 +7,7 @@ from .forms import SignUpForm, SignInForm, EditUserForm
 from django.contrib import auth, messages
 from django.urls import reverse
 from django.http import HttpResponseRedirect, HttpResponse
+import gettext as _
 
 
 class SignUp(View):
@@ -22,10 +23,10 @@ class SignUp(View):
             b_password = cd["password"]
             b_email = cd["email"]
             if User.objects.filter(username=b_username).exists():
-                messages.add_message(request, messages.INFO, "This username has been taken")
+                messages.add_message(request, messages.INFO, _("This username has been taken"))
                 return render(request, 'signup.html', {"form": SignUpForm})
             if User.objects.filter(email=b_email).exists():
-                messages.add_message(request, messages.INFO, "This email has been taken")
+                messages.add_message(request, messages.INFO, _("This email has been taken"))
                 return render(request, 'signup.html', {"form": SignUpForm}, status=200)
             else:
                 User.objects.create_user(b_username, b_password, b_email)
@@ -49,10 +50,10 @@ class SignIn(View):
             user = auth.authenticate(request, username=b_username, password=b_password)
             if user is not None:
                 auth.login(request, user)
-                messages.add_message(request, messages.INFO, "Logged in")
+                messages.add_message(request, messages.INFO, _("Logged in"))
                 return render(request, "home.html")
             else:
-                messages.add_message(request, messages.INFO, "Invalid username or password")
+                messages.add_message(request, messages.INFO, _("Invalid username or password"))
                 return render(request, "signin.html", {"form": SignInForm})
         else:
             return render(request, "trololoo.html")
@@ -62,7 +63,7 @@ class SignIn(View):
 @login_required
 def signout(request):
     auth.logout(request)
-    messages.add_message(request, messages.INFO, "Logged out")
+    messages.add_message(request, messages.INFO, _("Logged out"))
     return HttpResponseRedirect(reverse("home"))
 
 
@@ -82,7 +83,7 @@ class EditProfile(View):
             np = cd["new_password"]
             ne = cd["new_email"]
             if User.objects.filter(email=np).exists():
-                messages.add_message(request, messages.INFO, "Email already taken")
+                messages.add_message(request, messages.INFO, _("Email already taken"))
                 return render(request, "edituser.html", {"form": EditUserForm})
             else:
                 user.set_password(np)
