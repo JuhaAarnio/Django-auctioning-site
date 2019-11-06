@@ -13,5 +13,5 @@ class Auction(models.Model):
 
 
 class Bidder(models.Model):
-    auction_id = models.ForeignKey(Auction, on_delete=models.CASCADE)
-    bidder = models.ForeignKey(User, on_delete=models.CASCADE)
+    auction_id = models.IntegerField()
+    bidder = models.IntegerField()

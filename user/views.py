@@ -7,7 +7,7 @@ from .forms import SignUpForm, SignInForm, EditUserForm
 from django.contrib import auth, messages
 from django.urls import reverse
 from django.http import HttpResponseRedirect, HttpResponse
-import gettext as _
+from django.utils.translation import gettext as _
 
 
 class SignUp(View):

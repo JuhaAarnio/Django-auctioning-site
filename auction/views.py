@@ -14,8 +14,6 @@ from django.utils import translation
 from django.utils.translation import gettext as _
 
 
-
-
 def index(request):
     print(request.headers)
     print("creating response...")
@@ -97,21 +95,24 @@ class EditAuction(View):
 def bid(request, item_id):
     user = request.user
     auction = get_object_or_404(Auction, id=item_id)
-    bid_amount = request.POST
-    if auction.status is not "Active":
+    bid_amount = request.POST.get('bid_amount')
+    if auction.status is not 'Active':
         messages.add_message(request, messages.INFO, _("You can only bid on active auctions"))
-        return render(request, "home.html", {"form": BiddingForm})
+        return render(request, "auctions.html", {"form": BiddingForm})
     if auction.creator == user.username:
         messages.add_message(request, messages.INFO, _("You cannot bid on your own auction"))
-        return render(request, "home.html", {"form": BiddingForm})
-    if auction.minimum_price >= bid_amount:
+        return render(request, "auctions.html", {"form": BiddingForm})
+    if auction.minimum_price >= float(bid_amount):
         messages.add_message(request, messages.INFO, _("There already exists a higher bid"))
-        return render(request, "home.html")
+        return render(request, "auctions.html")
     if auction.highest_bidder_id == user.id:
         messages.add_message(request, messages.INFO, _("You are already the highest bidder"))
-        return render(request, "home.html")
+        return render(request, "auctions.html")
+    if len(bid_amount.rsplit('.')[-1]) > 2:
+        messages.add_message(request, messages.INFO, _("Too many decimals, "
+                                                       "you can only specify bids with maximum of two decimals"))
     else:
-        bidder = Bidder(auction_id=item_id, bidder=user)
+        bidder = Bidder(auction_id=item_id, bidder=user.id)
         auction.minimum_price = bid_amount
         auction.highest_bidder_id = user.id
         bidder.save()
