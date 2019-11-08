@@ -4,6 +4,7 @@ from .forms import AuctionForm, EditAuctionForm, BiddingForm
 from .models import Auction, Bidder
 from django.shortcuts import render, get_object_or_404
 from django.contrib import messages
+from django.contrib.auth.models import User
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from datetime import datetime, timedelta, timezone
@@ -30,9 +31,6 @@ def search(request):
         return render(request, 'auctions.html')
     else:
         return render(request, 'searchresults.html', {"matching_auctions": matching_auctions})
-
-
-
 
 
 @method_decorator(login_required, name="dispatch")
@@ -92,11 +90,12 @@ class EditAuction(View):
             return render(request, "home.html")
 
 
+@login_required()
 def bid(request, item_id):
     user = request.user
     auction = get_object_or_404(Auction, id=item_id)
     bid_amount = request.POST.get('bid_amount')
-    if auction.status is not 'Active':
+    if auction.status != 'Active':
         messages.add_message(request, messages.INFO, _("You can only bid on active auctions"))
         return render(request, "auctions.html", {"form": BiddingForm})
     if auction.creator == user.username:
@@ -111,13 +110,20 @@ def bid(request, item_id):
     if len(bid_amount.rsplit('.')[-1]) > 2:
         messages.add_message(request, messages.INFO, _("Too many decimals, "
                                                        "you can only specify bids with maximum of two decimals"))
+        return render(request, "auctions.html")
     else:
+        creator = User.objects.filter(username=auction.creator).first()
+        send_mail('Auction update', 'A bid has been placed on your auction', 'yaas@dontreply.com', [creator.email])
         bidder = Bidder(auction_id=item_id, bidder=user.id)
         auction.minimum_price = bid_amount
         auction.highest_bidder_id = user.id
         bidder.save()
         auction.save()
         messages.add_message(request, messages.INFO, _("Successfully bidded on auction"))
+        if auction.highest_bidder_id != -1:
+            prev_bidder = User.objects.filter(id=auction.highest_bidder_id).first()
+            send_mail('You have been outbidded', 'Your bid on an auction has been exceeded',
+                      'yaas@dontreply.com', [prev_bidder.email])
         return HttpResponseRedirect(reverse("home"))
 
 
@@ -130,7 +136,7 @@ def ban(request, item_id):
         return HttpResponseRedirect(reverse("home"))
     else:
         messages.add_message(request, messages.INFO, _("Only moderators can ban auctions"))
-        return HttpResponseRedirect("home")
+        return HttpResponseRedirect(reverse("home"))
 
 
 def resolve(request):
@@ -140,7 +146,7 @@ def resolve(request):
 def changeLanguage(request, lang_code):
     translation.activate(lang_code)
     request.session[translation.LANGUAGE_SESSION_KEY] = lang_code
-    messages.add_message(request, messages.INFO, _("Language changed successfully"))
+    messages.add_message(request, messages.INFO, _("Language changed successfully" + lang_code))
     return HttpResponseRedirect(reverse("home"))
 
 
