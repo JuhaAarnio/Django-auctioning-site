@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-05 21:29+0200\n"
+"POT-Creation-Date: 2019-11-09 11:28+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,69 +16,104 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: views.py:31
+#: auction/views.py:30
 msgid "No auctions found"
-msgstr "Inga auktioner hittades"
+msgstr "Inga auktioner hittade"
 
-#: views.py:60
+#: auction/views.py:56
 msgid "Invalid deadline"
 msgstr "Ogiltig tidsfrist"
 
-#: views.py:83
+#: auction/views.py:79
 msgid ""
 "You are not authorized to edit this auction or the auction has already "
 "expired"
 msgstr "Du har inte behörighet att redigera denna auktion eller så har auktionen redan"
 
-#: views.py:102
+#: auction/views.py:99
 msgid "You can only bid on active auctions"
 msgstr "Du kan bara bjuda på aktiva auktioner"
 
-#: views.py:105
+#: auction/views.py:102
 msgid "You cannot bid on your own auction"
 msgstr "Du kan inte bjuda på din egen auktion"
 
-#: views.py:108
+#: auction/views.py:105
 msgid "There already exists a higher bid"
 msgstr "Det finns redan ett högre bud"
 
-#: views.py:111
+
+#: auction/views.py:108
 msgid "You are already the highest bidder"
 msgstr "Du är redan högstbjudande"
 
-#: views.py:119
-msgid "Successfully bidded on auction"
-msgstr "Framgångsrikt bud på auktion"
+#: auction/views.py:111
+msgid ""
+"Too many decimals, you can only specify bids with maximum of two decimals"
+msgstr "För många decimaler, du kan bara ange bud med högst två decimaler"
 
-#: views.py:131
+#: auction/views.py:122
+msgid "Successfully bidded on auction"
+msgstr "Budd på auktion"
+
+#: auction/views.py:138
 msgid "Only moderators can ban auctions"
 msgstr "Endast moderatorer kan förbjuda auktioner"
 
-#: views.py:142
+#: auction/views.py:149
 msgid "Language changed successfully"
 msgstr "Språk har ändrats framgångsrikt"
 
-#: views.py:26
+#: templates/auctions.html:9
+msgid "Auctions"
+msgstr "Auktioner"
+
+#: templates/auctions.html:22
+msgid "Description: "
+msgstr "Beskrivning: "
+
+#: templates/auctions.html:23
+msgid "Current price: "
+msgstr "Aktuellt pris: "
+
+#: templates/auctions.html:24
+msgid "Deadline: "
+msgstr "Tidsfrist: "
+
+#: templates/auctions.html:25
+msgid "Creator: "
+msgstr "Skapare: "
+
+#: templates/auctions.html:26
+msgid "Status: "
+msgstr "Status: "
+
+#: templates/home.html:9
+msgid "Yaas Homepage"
+msgstr "Yaas Hemsidan"
+
+#: user/views.py:26
 msgid "This username has been taken"
 msgstr "Detta användarnamn har tagits"
 
-#: views.py:29
+#: user/views.py:29
 msgid "This email has been taken"
 msgstr "Det här e-postmeddelandet har tagits"
 
-#: views.py:53
+#: user/views.py:53
 msgid "Logged in"
 msgstr "Loggad in"
 
-#: views.py:56
+#: user/views.py:56
 msgid "Invalid username or password"
-msgstr ""
-
-#: views.py:66
-msgid "Logged out"
 msgstr "Ogiltigt användarnamn eller lösenord"
 
-#: views.py:86
+#: user/views.py:66
+msgid "Logged out"
+msgstr "Loggad ut"
+
+#: user/views.py:86
 msgid "Email already taken"
 msgstr "E-post redan taget"

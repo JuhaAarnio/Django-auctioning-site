@@ -130,7 +130,7 @@ def bid(request, item_id):
 def ban(request, item_id):
     user = request.user
     if user.is_superuser:
-        auction = Auction.objects.filter(id=item_id)
+        auction = Auction.objects.filter(id=item_id).first()
         auction.status = "Banned"
         auction.save()
         return HttpResponseRedirect(reverse("home"))
@@ -139,7 +139,7 @@ def ban(request, item_id):
         return HttpResponseRedirect(reverse("home"))
 
 
-def resolve(request):
+def resolve(request, item_id):
     pass
 
 

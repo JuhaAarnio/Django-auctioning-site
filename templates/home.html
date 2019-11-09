@@ -7,7 +7,8 @@
 <body>
 {% load i18n %}
 <h1>{% trans "Yaas Homepage" %}</h1>
-    <a href="{% url 'auction:browse_auctions' %}">Browse auctions</a> <a href="{% url 'changeLanguage' "sv" %}">Change language</a>
+    <a href="{% url 'auction:browse_auctions' %}">Browse auctions</a> <a href="{% url 'changeLanguage' "sv" %}">Change language to Swedish</a>
+    <a href="{% url 'auction:browse_auctions' %}">Browse auctions</a> <a href="{% url 'changeLanguage' "en" %}">Change language to English</a>
     {% if user.is_authenticated%}
         <p>Logged in as: {{ user.username }}</p>
         <a href="{% url 'auction:create' %}">Create auction</a>
@@ -16,6 +17,7 @@
         <a href="{% url 'signup' %}">Sign Up</a>
         <a href="{% url 'signin' %}">Sign In</a>
     {% endif %}
+
     {% if messages %}
     <ul class="messages">
         {% for message in messages %}
