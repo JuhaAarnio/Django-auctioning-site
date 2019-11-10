@@ -13,6 +13,7 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.utils import translation
 from django.utils.translation import gettext as _
+import requests
 
 
 def index(request):
@@ -72,8 +73,7 @@ class EditAuction(View):
     def get(self, request, item_id):
         auction = get_object_or_404(Auction, id=item_id)
         if auction.status == "Active" and auction.creator == request.user.username:
-            return render(request, "editauction.html", {"description": auction.description, "form": EditAuctionForm},
-                          auction)
+            return render(request, "editauction.html", {"auction": auction, "form":EditAuctionForm})
         else:
             messages.add_message(request, messages.INFO,
                                  _("You are not authorized to edit this auction or the auction has already expired"))
@@ -149,12 +149,18 @@ def ban(request, item_id):
 
 def resolve(request, item_id):
     auction = Auction.objects.filter(id=item_id).first()
-    auction.status = "Adjucated"
+    auction.status = "Adjudicated"
     creator = User.objects.filter(username=auction.creator).first()
     highest_bidder = User.objects.filter(id=auction.highest_bidder_id).first()
-    Bidder.objects.filter(bidder=highest_bidder.id).delete()
-    send_mail('Auction resolved', 'Auction you created has been resolved', 'yaas@dontreply.com', [creator.email])
-    send_mail('Auction won', 'You won an auction', 'yaas@dontreply.com', [highest_bidder.email])
+    if auction.highest_bidder_id != -1:
+        Bidder.objects.filter(bidder=highest_bidder.id).delete()
+        send_mail('Auction resolved', 'Auction you created has been resolved', 'yaas@dontreply.com', [creator.email])
+        send_mail('Auction won', 'You won an auction', 'yaas@dontreply.com', [highest_bidder.email])
+        return render(request, "auctions.html")
+    else:
+        messages.add_message(request, messages.INFO, ("Auction resolved without winner"))
+        send_mail('Auction resolved', 'Auction you created has been resolved', 'yaas@dontreply.com', [creator.email])
+        return render(request, "auctions.html")
 
 
 def changeLanguage(request, lang_code):
@@ -165,8 +171,17 @@ def changeLanguage(request, lang_code):
 
 
 def changeCurrency(request, currency_code):
-    currency = currency_code
-    currencies = {'EUR', 'USD'}
+    response = requests.get('https://api.exchangeratesapi.io/latest?symbols=USD HTTP/1.1')
+    response_json = response.content.json()
+    exchange_rates = response_json.headers['rates']
+    if currency_code == "eur":
+        currency = "EUR"
+        exchange_rate = exchange_rates["EUR"]
+    if currency_code == "usd":
+        currency = "USD"
+        exchange_rate = exchange_rates["USD"]
+    return render(request, "auctions.html.html", {"ex_rate": exchange_rate, "currency": currency})
+
 
 
 def browseAuctions(request):
@@ -176,18 +191,19 @@ def browseAuctions(request):
 
 def generateData(request):
     for i in range(1, 50):
-        user = User.objects.create_user("username " + str(i), "password" + str(i), "email" + str(i))
+        user = User.objects.create_user("username" + str(i), "password" + str(i), "email" + str(i))
         auction = Auction(item="item" + str(i), description="test description" + str(i), minimum_price=str(i),
                           deadline_date=datetime.now(timezone.utc) + timedelta(hours=96), status="Active",
                           creator=user.username, highest_bidder_id=-1)
         user.save()
         auction.save()
     for b in range(1, 10):
-        bidding_user = User.objects.filter(id=b).first()
-        bidded_auction = Auction.objects.filter(id=b).first()
+        bidding_user = User.objects.filter(username="username" + str(b)).first()
+        bidded_auction = Auction.objects.filter(item="item" + str(b)).first()
         bidded_auction.minimum_price = b + 100
         bidded_auction.highest_bidder = bidding_user.username
-        new_bidder = Bidder(bidded_auction=bidded_auction.id, bidder=bidding_user.id)
+        new_bidder = Bidder(auction_id=bidded_auction.id, bidder=bidding_user.id)
         bidded_auction.save()
         new_bidder.save()
+        return render(request, "home.html")
 

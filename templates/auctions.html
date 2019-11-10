@@ -12,6 +12,7 @@
     <input type="text", name="search_term">
     <input type="submit", value="Search">
 </form>
+<a href="{% url 'home' %}">Home</a>
 {% if auctions.count > 0 %}
     {% for auction in auctions %}
         {% if auction.status == "Active"%}
@@ -19,9 +20,12 @@
                 <h2>{{auction.item }}</h2> <a href="{% url 'auction:edit' auction.id %}">Edit Auction</a>
                 <a href="{% url 'auction:ban' auction.id %}">Ban</a>
             {% endif %}
+            {% if user.is_superuser %}
+                <a href="{% url 'auction:resolve' auction.id %}">Resolve</a>
+            {% endif %}
             <p>{% trans "Item:" %}{{auction.item}}</p>
             <p>{% trans "Description: " %}{{auction.description}}</p>
-            <p>{% trans "Current price: " %}{{auction.minimum_price}}</p>
+            <p>{% trans "Current price: " %}{{auction.minimum_price}}*{{ex_rate}}</p>
             <p>{% trans "Deadline: " %}{{auction.deadline_date}}</p>
             <p>{% trans "Creator: " %}{{auction.creator}}</p>
             <p>{% trans "Status: " %}{{auction.status}}</p>

@@ -5,6 +5,8 @@
     <title>Title</title>
 </head>
 <body>
+
+<a href="{% url 'home' %}">Home</a>
 {% for auction in matching_auctions %}
     {% if auction.status == "Active"%}
         <p>{{auction.item}}</p>
@@ -14,11 +16,12 @@
         <p>{{auction.creator_id}}</p>
         <form action={% url 'auction:bid' auction.id %} method="post">
             {% csrf_token %}
-            {{ form.as_p }}
+            <input type="text", name="bid_amount">
             <input type="Submit", value="Bid">
         </form>
     {% endif %}
 {% endfor %}
+
     {% if messages %}
     <ul class="messages">
         {% for message in messages %}
