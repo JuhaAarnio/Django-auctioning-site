@@ -12,7 +12,7 @@
         {% endfor %}
     </ul>
     {% endif %}
-    <form action={% url 'auction:edit' auction.id %} method="post">
+    <form action={% url 'auction:edit' auction.id%} method="post">
         {% csrf_token %}
         {{ form.as_p }}
         <input type="submit" value="Save">

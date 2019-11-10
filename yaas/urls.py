@@ -30,6 +30,7 @@ urlpatterns = [
     path('changeLanguage/<lang_code>/', auction.views.changeLanguage, name='changeLanguage'),
     path('changeCurrency/<currency_code>/', auction.views.changeCurrency, name='changeCurrency'),
     path('home/', user.views.Home.as_view(), name='home'),
+    path('generatedata/', auction.views.generateData, name='generatedata')
 ]
 
 urlpatterns += [

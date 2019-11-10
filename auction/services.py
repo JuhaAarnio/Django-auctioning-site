@@ -25,7 +25,7 @@ class SearchAuctionApi(APIView):
 
 class SearchAuctionWithTermApi(APIView):
     def get(self, request, term):
-        auctions = Auction.objects.filter(term)
+        auctions = Auction.objects.all().filter(item__contains=term)
         serializer = SerializeAuctions(auctions, many=True)
         return Response(serializer.data)
 

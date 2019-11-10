@@ -35,7 +35,6 @@ class SignUp(View):
             return HttpResponse(status=200)
 
 
-
 class SignIn(View):
     def get(self, request):
         form = SignInForm()
@@ -57,7 +56,6 @@ class SignIn(View):
                 return render(request, "signin.html", {"form": SignInForm})
         else:
             return render(request, "trololoo.html")
-
 
 
 @login_required

@@ -24,8 +24,8 @@ def index(request):
 
 
 def search(request):
-    search_term = request.POST
-    matching_auctions = Auction.objects.all().filter(Auction.item.__contains__(search_term))
+    search_term = request.POST.get('search_term')
+    matching_auctions = Auction.objects.all().filter(item__icontains=search_term)
     if len(matching_auctions) < 1 and search_term != ' ':
         messages.add_message(request, messages.INFO, _("No auctions found"))
         return render(request, 'auctions.html')
@@ -132,15 +132,29 @@ def ban(request, item_id):
     if user.is_superuser:
         auction = Auction.objects.filter(id=item_id).first()
         auction.status = "Banned"
+        user = User.objects.filter(username=auction.creator).first()
+        send_mail('Auction banned', 'Your auction has been banned', 'yaas@dontrelpy.com', [user.email])
+        bidders = list(Bidder.objects.all().filter(auction_id=auction.id))
+        for bidder in bidders:
+            bidded_user = User.objects.filter(id=bidder.bidder).first()
+            send_mail('Auction banned', 'Auction you bidded on has been banned',
+                      'yaas@dontreply.com', [bidded_user.email])
+            Bidder.objects.filter(bidder=bidded_user.id).delete()
         auction.save()
         return HttpResponseRedirect(reverse("home"))
     else:
         messages.add_message(request, messages.INFO, _("Only moderators can ban auctions"))
-        return HttpResponseRedirect(reverse("home"))
+        return HttpResponseRedirect(reverse("auction:browse_auctions"))
 
 
 def resolve(request, item_id):
-    pass
+    auction = Auction.objects.filter(id=item_id).first()
+    auction.status = "Adjucated"
+    creator = User.objects.filter(username=auction.creator).first()
+    highest_bidder = User.objects.filter(id=auction.highest_bidder_id).first()
+    Bidder.objects.filter(bidder=highest_bidder.id).delete()
+    send_mail('Auction resolved', 'Auction you created has been resolved', 'yaas@dontreply.com', [creator.email])
+    send_mail('Auction won', 'You won an auction', 'yaas@dontreply.com', [highest_bidder.email])
 
 
 def changeLanguage(request, lang_code):
@@ -158,4 +172,22 @@ def changeCurrency(request, currency_code):
 def browseAuctions(request):
     auctions = Auction.objects.order_by('item')
     return render(request, "auctions.html", {"auctions": auctions})
+
+
+def generateData(request):
+    for i in range(1, 50):
+        user = User.objects.create_user("username " + str(i), "password" + str(i), "email" + str(i))
+        auction = Auction(item="item" + str(i), description="test description" + str(i), minimum_price=str(i),
+                          deadline_date=datetime.now(timezone.utc) + timedelta(hours=96), status="Active",
+                          creator=user.username, highest_bidder_id=-1)
+        user.save()
+        auction.save()
+    for b in range(1, 10):
+        bidding_user = User.objects.filter(id=b).first()
+        bidded_auction = Auction.objects.filter(id=b).first()
+        bidded_auction.minimum_price = b + 100
+        bidded_auction.highest_bidder = bidding_user.username
+        new_bidder = Bidder(bidded_auction=bidded_auction.id, bidder=bidding_user.id)
+        bidded_auction.save()
+        new_bidder.save()
 

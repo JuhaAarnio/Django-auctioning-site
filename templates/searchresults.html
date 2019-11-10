@@ -7,15 +7,12 @@
 <body>
 {% for auction in matching_auctions %}
     {% if auction.status == "Active"%}
-        {% if user.is_authenticated %}
-            <h2>{{auction.item }}</h2> <a href="{% url 'auction:edit' auction.id %}">Edit Auction</a> <a href="{% url 'auction:bid' auction.id %}">Bid</a>
-            <a> href?="{% url 'auction:ban' %}">Ban</a>
-        {% endif %}
+        <p>{{auction.item}}</p>
         <p>{{auction.description}}</p>
         <p>{{auction.minimum_price}}</p>
         <p>{{auction.deadline_date}}</p>
         <p>{{auction.creator_id}}</p>
-        <form action={% url 'auction:bid' %} method="post">
+        <form action={% url 'auction:bid' auction.id %} method="post">
             {% csrf_token %}
             {{ form.as_p }}
             <input type="Submit", value="Bid">
